@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ProSource — Espace Fournisseur</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0d0e11; --surface:#13151a; --card:#1a1d24; --border:#2a2d36;
+  --accent:#e8c547; --accent2:#4ecdc4; --danger:#ff6b6b;
+  --text:#f0f0f0; --muted:#6b7080; --green:#5de88a;
+  --safe-b:env(safe-area-inset-bottom,0px);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+
+/* ── LOGIN ── */
+#login-screen{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;background:var(--bg);padding:20px}
+.login-bg{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.login-bg::before{content:'';position:absolute;top:-30%;left:-20%;width:70vw;height:70vw;background:radial-gradient(circle,rgba(232,197,71,.09) 0%,transparent 70%);animation:pulse 6s ease-in-out infinite}
+.login-bg::after{content:'';position:absolute;bottom:-20%;right:-10%;width:50vw;height:50vw;background:radial-gradient(circle,rgba(78,205,196,.06) 0%,transparent 70%);animation:pulse 8s ease-in-out infinite reverse}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+.login-box{position:relative;z-index:1;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:44px 36px;width:100%;max-width:440px;box-shadow:0 40px 120px rgba(0,0,0,.6);animation:loginIn .7s cubic-bezier(.22,1,.36,1) both}
+@keyframes loginIn{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+.login-logo{font-family:'DM Serif Display',serif;font-size:1.9rem;color:var(--accent);letter-spacing:-.5px;margin-bottom:5px}
+.login-logo span{color:var(--text)}
+.login-tagline{font-size:.72rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:36px}
+.login-label{font-size:.7rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:9px;display:block}
+.login-input-wrap{position:relative;margin-bottom:24px}
+.login-input{width:100%;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 48px 14px 15px;font-family:'DM Mono',monospace;font-size:1rem;color:var(--text);outline:none;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none}
+.login-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(232,197,71,.12)}
+.toggle-pw{position:absolute;right:13px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);font-size:1.1rem;transition:color .2s;padding:4px}
+.toggle-pw:hover{color:var(--accent)}
+.login-btn{width:100%;background:var(--accent);color:#0d0e11;border:none;border-radius:10px;padding:15px;font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:background .2s,transform .15s,box-shadow .2s;-webkit-appearance:none}
+.login-btn:hover{background:#f5d55e;transform:translateY(-1px);box-shadow:0 8px 30px rgba(232,197,71,.3)}
+.login-btn:active{transform:translateY(0)}
+.login-error{margin-top:14px;padding:11px 15px;background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.3);border-radius:8px;color:var(--danger);font-size:.8rem;text-align:center;display:none}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+.shake{animation:shake .4s ease}
+
+/* ── APP ── */
+#app{display:none}
+
+/* ── NAVBAR ── */
+.navbar{position:sticky;top:0;z-index:50;background:rgba(13,14,17,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 18px;height:58px;display:flex;align-items:center;justify-content:space-between;animation:fadeDown .5s ease both}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+.nav-logo{font-family:'DM Serif Display',serif;font-size:1.3rem;color:var(--accent);white-space:nowrap}
+.nav-logo span{color:var(--text)}
+.nav-right{display:flex;align-items:center;gap:10px}
+.nav-badge{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:5px 11px;font-size:.62rem;letter-spacing:1px;text-transform:uppercase;color:var(--accent2)}
+@media(max-width:479px){.nav-badge{display:none}}
+.nav-logout{background:none;border:1px solid var(--border);border-radius:8px;padding:6px 12px;color:var(--muted);font-family:'Syne',sans-serif;font-size:.72rem;cursor:pointer;transition:all .2s;white-space:nowrap}
+.nav-logout:hover{border-color:var(--danger);color:var(--danger)}
+
+/* ── HERO ── */
+.hero{padding:36px 18px 22px;max-width:1300px;margin:0 auto;animation:fadeUp .6s .1s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.hero-label{font-size:.62rem;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+.hero h1{font-family:'DM Serif Display',serif;font-size:clamp(1.7rem,5.5vw,3rem);line-height:1.15;margin-bottom:8px}
+.hero h1 em{font-style:italic;color:var(--accent)}
+.hero p{color:var(--muted);font-size:.84rem;max-width:460px;line-height:1.6}
+
+/* ── CAT NAV ── */
+.cat-nav{max-width:1300px;margin:0 auto;padding:0 18px 6px;animation:fadeUp .6s .15s ease both}
+.cat-main{display:flex;gap:7px;flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;-ms-overflow-style:none;margin-bottom:8px}
+.cat-main::-webkit-scrollbar{display:none}
+.cat-main-btn{flex-shrink:0;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:7px 15px;color:var(--muted);font-family:'Syne',sans-serif;font-size:.76rem;cursor:pointer;transition:all .2s;white-space:nowrap;display:flex;align-items:center;gap:5px}
+.cat-main-btn:hover{border-color:var(--accent);color:var(--text)}
+.cat-main-btn.active{background:var(--accent);border-color:var(--accent);color:#0d0e11;font-weight:700}
+
+.cat-sub{display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px;min-height:34px;scrollbar-width:none;-ms-overflow-style:none}
+.cat-sub::-webkit-scrollbar{display:none}
+.cat-sub-btn{flex-shrink:0;background:transparent;border:1px solid var(--border);border-radius:20px;padding:5px 13px;color:var(--muted);font-family:'Syne',sans-serif;font-size:.7rem;cursor:pointer;transition:all .2s;white-space:nowrap}
+.cat-sub-btn:hover{border-color:var(--accent2);color:var(--accent2)}
+.cat-sub-btn.active{background:rgba(78,205,196,.12);border-color:var(--accent2);color:var(--accent2);font-weight:700}
+
+/* ── GRID ── */
+.grid{max-width:1300px;margin:0 auto;padding:10px 18px 100px;display:grid;grid-template-columns:1fr;gap:14px;animation:fadeUp .6s .22s ease both}
+@media(min-width:480px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:860px){.grid{grid-template-columns:repeat(3,1fr);gap:18px;padding:10px 22px 100px}}
+@media(min-width:1150px){.grid{grid-template-columns:repeat(4,1fr)}}
+
+/* ── CARD ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;transition:border-color .2s,transform .2s,box-shadow .2s}
+@media(hover:hover){.card:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:0 14px 44px rgba(0,0,0,.4)}}
+
+.card-img-wrap{position:relative;height:190px;background:#181c24;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0}
+.card-img-wrap img{height:100%;width:100%;object-fit:contain;padding:12px;display:block}
+.card-placeholder{font-size:3rem}
+
+.card-tag{position:absolute;top:10px;left:10px;background:var(--accent);color:#0d0e11;font-size:.58rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;border-radius:4px;padding:3px 8px}
+.card-subtag{position:absolute;top:32px;left:10px;background:rgba(78,205,196,.14);color:var(--accent2);border:1px solid rgba(78,205,196,.3);font-size:.55rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;border-radius:4px;padding:2px 8px}
+.badge-stock{position:absolute;top:10px;right:10px;border-radius:4px;padding:3px 8px;font-size:.58rem;font-weight:700;letter-spacing:1px}
+.in-stock{background:rgba(93,232,138,.15);color:var(--green);border:1px solid rgba(93,232,138,.3)}
+.low-stock{background:rgba(232,197,71,.15);color:var(--accent);border:1px solid rgba(232,197,71,.3)}
+
+.card-body{padding:13px 15px 0;flex:1}
+.card-ref{font-family:'DM Mono',monospace;font-size:.6rem;color:var(--muted);letter-spacing:1.5px;margin-bottom:4px}
+.card-title{font-family:'DM Serif Display',serif;font-size:1.05rem;line-height:1.3;margin-bottom:3px}
+.card-brand{font-size:.68rem;color:var(--accent2);letter-spacing:.5px;margin-bottom:6px}
+.card-desc{font-size:.76rem;color:var(--muted);line-height:1.5;margin-bottom:10px}
+
+.card-dosage{display:inline-flex;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:4px 10px;margin-bottom:8px}
+.dosage-lbl{font-size:.58rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
+.dosage-val{font-family:'DM Mono',monospace;font-size:.82rem;color:var(--accent2);font-weight:500}
+
+.card-cond{font-size:.65rem;color:var(--muted);margin-bottom:8px}
+
+.specs{border-top:1px solid var(--border);padding:11px 15px;display:grid;grid-template-columns:1fr 1fr;gap:8px 6px}
+.spec-item{display:flex;flex-direction:column;gap:2px}
+.spec-lbl{font-size:.56rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
+.spec-val{font-family:'DM Mono',monospace;font-size:.8rem;font-weight:500;color:var(--text)}
+.spec-val.ht{color:var(--accent2)}
+.spec-val.ttc{color:var(--accent);font-size:.88rem}
+.spec-val.total{color:var(--green)}
+
+.card-footer{padding:9px 15px 15px;display:flex;gap:8px}
+.btn-link{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;background:var(--accent);color:#0d0e11;border:none;border-radius:8px;padding:10px 0;font-family:'Syne',sans-serif;font-weight:700;font-size:.7rem;letter-spacing:1px;text-transform:uppercase;cursor:pointer;text-decoration:none;transition:background .2s;-webkit-appearance:none}
+.btn-link:hover{background:#f5d55e}
+.btn-info{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--muted);cursor:pointer;transition:all .2s;font-size:.88rem}
+.btn-info:hover{border-color:var(--accent2);color:var(--accent2)}
+
+/* ── COMING SOON ── */
+.card-coming{background:var(--card);border:1px dashed var(--border);border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:260px;gap:11px;opacity:.42;transition:opacity .2s,border-color .2s}
+.card-coming:hover{opacity:.68;border-color:var(--accent)}
+.coming-icon{width:52px;height:52px;border-radius:50%;background:var(--surface);border:1px dashed var(--border);display:flex;align-items:center;justify-content:center;font-size:1.3rem}
+.coming-label{font-family:'DM Serif Display',serif;font-size:.9rem;color:var(--muted)}
+.coming-tag{font-size:.58rem;letter-spacing:2px;text-transform:uppercase;color:var(--border);background:var(--surface);border:1px dashed var(--border);border-radius:20px;padding:3px 11px}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.76);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:none;align-items:flex-end;justify-content:center}
+@media(min-width:580px){.modal-overlay{align-items:center;padding:20px}}
+.modal-overlay.open{display:flex}
+.modal{background:var(--card);border:1px solid var(--border);width:100%;max-height:92vh;overflow-y:auto;border-radius:20px 20px 0 0;animation:modalUp .3s cubic-bezier(.22,1,.36,1);padding-bottom:var(--safe-b)}
+@media(min-width:580px){.modal{border-radius:20px;max-width:580px;animation:modalIn .3s cubic-bezier(.22,1,.36,1)}}
+@keyframes modalUp{from{opacity:0;transform:translateY(55px)}to{opacity:1;transform:translateY(0)}}
+@keyframes modalIn{from{opacity:0;transform:scale(.93)}to{opacity:1;transform:scale(1)}}
+.modal-drag{width:34px;height:4px;background:var(--border);border-radius:2px;margin:11px auto 0;display:block}
+@media(min-width:580px){.modal-drag{display:none}}
+.modal-header{padding:18px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.modal-close{background:none;border:none;color:var(--muted);font-size:1.25rem;cursor:pointer;line-height:1;flex-shrink:0;padding:4px;transition:color .2s}
+.modal-close:hover{color:var(--danger)}
+.modal-body{padding:16px 20px 22px}
+.modal-desc{color:var(--muted);font-size:.83rem;line-height:1.6;margin-bottom:14px}
+.modal-specs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.modal-spec{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 13px}
+.modal-spec-lbl{font-size:.58rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+.modal-spec-val{font-family:'DM Mono',monospace;font-size:.92rem;font-weight:500}
+.modal-link{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--accent);color:#0d0e11;border-radius:10px;padding:13px;font-family:'Syne',sans-serif;font-weight:700;font-size:.84rem;letter-spacing:1px;text-transform:uppercase;text-decoration:none;transition:background .2s,box-shadow .2s}
+.modal-link:hover{background:#f5d55e;box-shadow:0 8px 30px rgba(232,197,71,.3)}
+
+.empty-state{grid-column:1/-1;text-align:center;padding:50px 20px;color:var(--muted);font-size:.88rem}
+.empty-state span{display:block;font-size:2.2rem;margin-bottom:10px}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-bg"></div>
+  <div class="login-box">
+    <div class="login-logo">Pro<span>Source</span></div>
+    <div class="login-tagline">Espace fournisseur — accès restreint</div>
+    <label class="login-label" for="pw">Mot de passe</label>
+    <div class="login-input-wrap">
+      <input class="login-input" id="pw" type="password" placeholder="••••••••" autocomplete="off"/>
+      <button class="toggle-pw" onclick="togglePw()">👁</button>
+    </div>
+    <button class="login-btn" onclick="tryLogin()">Accéder au catalogue</button>
+    <div class="login-error" id="login-error">Mot de passe incorrect. Accès refusé.</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <nav class="navbar">
+    <div class="nav-logo">Pro<span>Source</span></div>
+    <div class="nav-right">
+      <div class="nav-badge">🔒 Accès sécurisé</div>
+      <button class="nav-logout" onclick="logout()">Déconnexion</button>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-label">Catalogue épicerie — tarifs fournisseur 2025</div>
+    <h1>Votre <em>épicerie</em> en gros</h1>
+    <p>Tarifs exclusifs fournisseur, TVA alimentaire appliquée, quantités minimum et liens produits directs.</p>
+  </section>
+
+  <div class="cat-nav">
+    <div class="cat-main" id="cat-main"></div>
+    <div class="cat-sub"  id="cat-sub"></div>
+  </div>
+
+  <div class="grid" id="cards-grid"></div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal" onclick="closeModalOverlay(event)">
+  <div class="modal" id="modal-inner">
+    <div class="modal-drag"></div>
+    <div class="modal-header">
+      <div style="min-width:0">
+        <div style="font-family:'DM Mono',monospace;font-size:.62rem;color:var(--muted);letter-spacing:1.5px;margin-bottom:3px" id="modal-ref"></div>
+        <div style="font-family:'DM Serif Display',serif;font-size:1.35rem;line-height:1.25;word-break:break-word" id="modal-title"></div>
+        <div style="font-size:.66rem;color:var(--accent2);letter-spacing:1px;margin-top:3px" id="modal-path"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p class="modal-desc" id="modal-desc"></p>
+      <div class="modal-specs" id="modal-specs"></div>
+      <a class="modal-link" id="modal-link" href="#" target="_blank" rel="noopener">🔗 Accéder à la fiche produit</a>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ─── CATEGORIES ─── */
+const CATS = [
+  { id:'all',        label:'🛒 Tout',          sub:[] },
+  { id:'boissons',   label:'🥤 Boissons',       sub:['Boissons énergisantes','Eaux','Boissons sucrées','Jus & nectars','Cafés & thés','Boissons alcoolisées'] },
+  { id:'nourriture', label:'🍞 Nourriture',     sub:['Épicerie sèche','Conserves','Snacks & confiseries','Condiments & sauces','Boulangerie'] },
+  { id:'frais',      label:'🧊 Produits frais', sub:['Produits laitiers','Œufs','Charcuterie','Traiteur'] },
+  { id:'utilitaire', label:'🧹 Utilitaire',     sub:['Emballages alimentaires','Sacs & films','Nettoyage','Vaisselle jetable'] },
+  { id:'hygiene',    label:'🧴 Hygiène',        sub:['Soins corps','Entretien ménager','Papier & essuie-tout'] },
+];
+
+/* ─── PRODUITS ─── */
+const products = [
+  {
+    id:1, ref:'BOI-MON-001',
+    categorie:'boissons', souscategorie:'Boissons énergisantes',
+    nom:'Monster Rio Punch',
+    marque:'Monster Energy',
+    image:'https://images.openfoodfacts.org/images/products/505/678/490/2301/front_en.13.400.jpg',
+    description:'Saveurs tropicales — papaye, mangue, épices. Taurine, ginseng, vitamines B. Sans alcool. Canette 50cl.',
+    lien:'https://www.monsterenergy.com/fr-fr/energy-drinks/juiced-monster/juiced-monster-rio-punch/',
+    dosage:50, unite:'cl',
+    conditionnement:'Carton ×24 canettes',
+    prixHT:1.49, tva:20, qteMin:24,
+    stock:'in-stock', stockLabel:'En stock'
+  },
+  {
+    id:2, ref:'BOI-MON-002',
+    categorie:'boissons', souscategorie:'Boissons énergisantes',
+    nom:'Monster Ultra White',
+    marque:'Monster Energy',
+    image:'https://images.openfoodfacts.org/images/products/506/033/750/0982/front_en.36.400.jpg',
+    description:'Zéro sucre, zéro calorie. Saveur citrus rafraîchissante. 150 mg de caféine. Canette 50cl.',
+    lien:'https://www.monsterenergy.com/fr-fr/energy-drinks/zero-sucre/ultra-white/',
+    dosage:50, unite:'cl',
+    conditionnement:'Carton ×24 canettes',
+    prixHT:1.49, tva:20, qteMin:24,
+    stock:'in-stock', stockLabel:'En stock'
+  },
+  /* À VENIR */
+  { id:3,  coming:true, categorie:'boissons',   souscategorie:'Eaux' },
+  { id:4,  coming:true, categorie:'boissons',   souscategorie:'Jus & nectars' },
+  { id:5,  coming:true, categorie:'boissons',   souscategorie:'Boissons sucrées' },
+  { id:6,  coming:true, categorie:'nourriture', souscategorie:'Épicerie sèche' },
+  { id:7,  coming:true, categorie:'nourriture', souscategorie:'Conserves' },
+  { id:8,  coming:true, categorie:'frais',      souscategorie:'Produits laitiers' },
+  { id:9,  coming:true, categorie:'frais',      souscategorie:'Œufs' },
+  { id:10, coming:true, categorie:'utilitaire', souscategorie:'Emballages alimentaires' },
+  { id:11, coming:true, categorie:'hygiene',    souscategorie:'Entretien ménager' },
+];
+
+/* ─── HELPERS ─── */
+const calcTTC   = (ht,t)  => ht*(1+t/100);
+const calcTotal = (ht,q)  => ht*q;
+const fmt       = n => n.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
+const fmtDose   = p => (p.dosage && p.unite) ? `${p.dosage} ${p.unite}` : null;
+
+/* ─── STATE ─── */
+let curCat='all', curSub=null;
+
+/* ─── AUTH ─── */
+const PASS='L4v01X';
+document.getElementById('pw').addEventListener('keydown',e=>{ if(e.key==='Enter') tryLogin(); });
+
+function tryLogin(){
+  if(document.getElementById('pw').value===PASS){
+    const ls=document.getElementById('login-screen');
+    ls.style.transition='opacity .48s'; ls.style.opacity='0';
+    setTimeout(()=>{ ls.style.display='none'; document.getElementById('app').style.display='block'; buildCatNav(); render(); },460);
+  } else {
+    const box=document.querySelector('.login-box');
+    box.classList.remove('shake'); void box.offsetWidth; box.classList.add('shake');
+    document.getElementById('login-error').style.display='block';
+    document.getElementById('pw').value='';
+  }
+}
+function togglePw(){ const i=document.getElementById('pw'); i.type=i.type==='password'?'text':'password'; }
+function logout(){
+  document.getElementById('app').style.display='none';
+  const ls=document.getElementById('login-screen');
+  ls.style.display='flex'; ls.style.opacity='0';
+  setTimeout(()=>{ ls.style.transition='opacity .4s'; ls.style.opacity='1'; },10);
+  document.getElementById('pw').value='';
+  document.getElementById('login-error').style.display='none';
+  curCat='all'; curSub=null;
+}
+
+/* ─── CAT NAV ─── */
+function buildCatNav(){
+  const el=document.getElementById('cat-main');
+  CATS.forEach(c=>{
+    const b=document.createElement('button');
+    b.className='cat-main-btn'+(c.id==='all'?' active':'');
+    b.textContent=c.label;
+    b.onclick=()=>selectCat(c.id);
+    el.appendChild(b);
+  });
+}
+function selectCat(id){
+  curCat=id; curSub=null;
+  document.querySelectorAll('.cat-main-btn').forEach((b,i)=>b.classList.toggle('active',CATS[i].id===id));
+  renderSubNav(); render();
+}
+function renderSubNav(){
+  const el=document.getElementById('cat-sub');
+  el.innerHTML='';
+  const cat=CATS.find(c=>c.id===curCat);
+  if(!cat||!cat.sub.length) return;
+  const all=document.createElement('button');
+  all.className='cat-sub-btn'+(curSub===null?' active':'');
+  all.textContent='Tout'; all.onclick=()=>{ curSub=null; renderSubNav(); render(); };
+  el.appendChild(all);
+  cat.sub.forEach(s=>{
+    const b=document.createElement('button');
+    b.className='cat-sub-btn'+(curSub===s?' active':'');
+    b.textContent=s; b.onclick=()=>{ curSub=s; renderSubNav(); render(); };
+    el.appendChild(b);
+  });
+}
+
+/* ─── RENDER ─── */
+function render(){
+  const grid=document.getElementById('cards-grid');
+  grid.innerHTML='';
+  let list=products;
+  if(curCat!=='all') list=list.filter(p=>p.categorie===curCat);
+  if(curSub)         list=list.filter(p=>p.souscategorie===curSub);
+
+  if(!list.length){
+    grid.innerHTML='<div class="empty-state"><span>🔍</span>Aucun article dans cette catégorie pour l\'instant.</div>';
+    return;
+  }
+
+  list.forEach((p,i)=>{
+    const el=document.createElement('div');
+    el.style.cssText=`animation:fadeUp .44s ${i*.055}s ease both`;
+
+    if(p.coming){
+      el.className='card-coming';
+      el.innerHTML=`<div class="coming-icon">🔒</div>
+        <div class="coming-label">Article à venir</div>
+        <div class="coming-tag">${p.souscategorie||p.categorie}</div>`;
+      grid.appendChild(el); return;
+    }
+
+    el.className='card';
+    const ttc=calcTTC(p.prixHT,p.tva);
+    const total=calcTotal(p.prixHT,p.qteMin);
+    const dose=fmtDose(p);
+
+    el.innerHTML=`
+      <div class="card-img-wrap">
+        ${p.image?`<img src="${p.image}" alt="${p.nom}" loading="lazy" onerror="this.outerHTML='<div class=card-placeholder>📦</div>'">`:`<div class="card-placeholder">📦</div>`}
+        <span class="card-tag">${p.categorie}</span>
+        ${p.souscategorie?`<span class="card-subtag">${p.souscategorie}</span>`:''}
+        <span class="badge-stock ${p.stock}">${p.stockLabel}</span>
+      </div>
+      <div class="card-body">
+        <div class="card-ref">${p.ref}</div>
+        <div class="card-title">${p.nom}</div>
+        ${p.marque?`<div class="card-brand">${p.marque}</div>`:''}
+        <div class="card-desc">${p.description}</div>
+        ${dose?`<div class="card-dosage"><span class="dosage-lbl">Contenance</span><span class="dosage-val">${dose}</span></div>`:''}
+        ${p.conditionnement?`<div class="card-cond">📦 ${p.conditionnement}</div>`:''}
+      </div>
+      <div class="specs">
+        <div class="spec-item"><span class="spec-lbl">Prix HT unit.</span><span class="spec-val ht">${fmt(p.prixHT)}</span></div>
+        <div class="spec-item"><span class="spec-lbl">Prix TTC unit.</span><span class="spec-val ttc">${fmt(ttc)}</span></div>
+        <div class="spec-item"><span class="spec-lbl">Qté min.</span><span class="spec-val">${p.qteMin} u.</span></div>
+        <div class="spec-item"><span class="spec-lbl">Total HT min.</span><span class="spec-val total">${fmt(total)}</span></div>
+      </div>
+      <div class="card-footer">
+        <a class="btn-link" href="${p.lien}" target="_blank" rel="noopener">🔗 Fiche produit</a>
+        <button class="btn-info" onclick="openModal(${p.id})">📋</button>
+      </div>`;
+    grid.appendChild(el);
+  });
+}
+
+/* ─── MODAL ─── */
+function openModal(id){
+  const p=products.find(x=>x.id===id);
+  if(!p||p.coming) return;
+  const ttc=calcTTC(p.prixHT,p.tva);
+  const total=calcTotal(p.prixHT,p.qteMin);
+  const totalTTC=calcTTC(total,p.tva);
+  const dose=fmtDose(p);
+
+  document.getElementById('modal-ref').textContent=p.ref;
+  document.getElementById('modal-title').textContent=p.nom;
+  document.getElementById('modal-path').textContent=[p.categorie,p.souscategorie].filter(Boolean).join(' › ');
+  document.getElementById('modal-desc').textContent=p.description;
+  document.getElementById('modal-link').href=p.lien;
+
+  document.getElementById('modal-specs').innerHTML=`
+    ${dose?`<div class="modal-spec" style="grid-column:1/-1"><div class="modal-spec-lbl">Contenance / Dosage</div><div class="modal-spec-val" style="color:var(--accent2)">${dose}</div></div>`:''}
+    ${p.conditionnement?`<div class="modal-spec" style="grid-column:1/-1"><div class="modal-spec-lbl">Conditionnement</div><div class="modal-spec-val">${p.conditionnement}</div></div>`:''}
+    <div class="modal-spec"><div class="modal-spec-lbl">Prix HT unitaire</div><div class="modal-spec-val" style="color:var(--accent2)">${fmt(p.prixHT)}</div></div>
+    <div class="modal-spec"><div class="modal-spec-lbl">TVA</div><div class="modal-spec-val">${p.tva} %</div></div>
+    <div class="modal-spec"><div class="modal-spec-lbl">Prix TTC unitaire</div><div class="modal-spec-val" style="color:var(--accent)">${fmt(ttc)}</div></div>
+    <div class="modal-spec"><div class="modal-spec-lbl">Qté min. commande</div><div class="modal-spec-val">${p.qteMin} unité${p.qteMin>1?'s':''}</div></div>
+    <div class="modal-spec"><div class="modal-spec-lbl">Total HT minimum</div><div class="modal-spec-val" style="color:var(--green)">${fmt(total)}</div></div>
+    <div class="modal-spec"><div class="modal-spec-lbl">Total TTC minimum</div><div class="modal-spec-val" style="color:var(--accent)">${fmt(totalTTC)}</div></div>
+    <div class="modal-spec" style="grid-column:1/-1"><div class="modal-spec-lbl">Disponibilité</div><div class="modal-spec-val"><span class="badge-stock ${p.stock}" style="position:static;font-size:.72rem;padding:4px 11px">${p.stockLabel}</span></div></div>`;
+
+  document.getElementById('modal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeModal(){ document.getElementById('modal').classList.remove('open'); document.body.style.overflow=''; }
+function closeModalOverlay(e){ if(e.target===document.getElementById('modal')) closeModal(); }
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
+</script>
+</body>
+</html>
