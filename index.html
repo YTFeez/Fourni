@@ -241,7 +241,7 @@ const products = [
     lien:'https://distribucionmayorista.online/fr/boisson-energisante/3927-monster-energy-rio-punch-500ml-5056784901069.html',
     dosage:50, unite:'cl',
     conditionnement:'Carton ×24 canettes',
-    prixHT:1.49, tva:20, qteMin:24,
+    prixHT:1.1, tva:20, qteMin:24,
     stock:'in-stock', stockLabel:'En stock'
   },
   {
@@ -354,7 +354,7 @@ function loadImage(wrap, src, fallbackSvg) {
   wrap.appendChild(img);
   tags.forEach(t => wrap.appendChild(t));
 }
-const calcTTC   = (ht,t)  => ht*(1+t/100);
+const calcTTC   = (ht,t)  => ht+5.5%;
 const calcTotal = (ht,q)  => ht*q;
 const fmt       = n => n.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
 const fmtDose   = p => (p.dosage && p.unite) ? `${p.dosage} ${p.unite}` : null;
