@@ -339,18 +339,19 @@ const fmtDose   = p => (p.dosage && p.unite) ? `${p.dosage} ${p.unite}` : null;
 
 /* ─── IMAGE LOADER ─── */
 function loadImage(wrap, src, fallbackSvg) {
-  // Sauvegarder les badges/tags avant de vider le wrap
-  const tags = Array.from(wrap.querySelectorAll('.card-tag,.card-subtag,.badge-stock'));
+  // Cloner les badges/tags pour pouvoir les ré-injecter après
+  const tags = Array.from(wrap.querySelectorAll('.card-tag,.card-subtag,.badge-stock'))
+                    .map(t => t.cloneNode(true));
 
-  if (!src) {
+  const showFallback = () => {
     wrap.innerHTML = fallbackSvg || '<div class="card-placeholder">📦</div>';
     tags.forEach(t => wrap.appendChild(t));
-    return;
-  }
+  };
 
-  const img = document.createElement('img');
+  if (!src) { showFallback(); return; }
+
+  const img = new Image();
   img.style.cssText = 'height:100%;width:100%;object-fit:contain;padding:12px;display:block';
-  img.loading = 'lazy';
   img.alt = src;
 
   img.onload = () => {
@@ -359,13 +360,17 @@ function loadImage(wrap, src, fallbackSvg) {
     tags.forEach(t => wrap.appendChild(t));
   };
 
-  // BUG FIX 2 : onerror — on affiche le fallback SVG si l'image est introuvable
-  img.onerror = () => {
-    wrap.innerHTML = fallbackSvg || '<div class="card-placeholder">📦</div>';
-    tags.forEach(t => wrap.appendChild(t));
-  };
+  img.onerror = showFallback;
 
+  // Assigner src en dernier pour que onload/onerror soient déjà attachés
   img.src = src;
+
+  // Si l'image est déjà en cache (complete avant onload)
+  if (img.complete && img.naturalWidth > 0) {
+    wrap.innerHTML = '';
+    wrap.appendChild(img);
+    tags.forEach(t => wrap.appendChild(t));
+  }
 }
 
 /* ─── STATE ─── */
