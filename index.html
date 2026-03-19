@@ -235,7 +235,8 @@ const products = [
     categorie:'boissons', souscategorie:'Boissons énergisantes',
     nom:'Monster Rio Punch',
     marque:'Monster Energy',
-    image:'https://images.openfoodfacts.org/images/products/505/678/490/2301/front_en.13.400.jpg',
+    image:'monster-rio-punch.png',
+    svgFallback:'rio',
     description:'Saveurs tropicales — papaye, mangue, épices. Taurine, ginseng, vitamines B. Sans alcool. Canette 50cl.',
     lien:'https://www.monsterenergy.com/fr-fr/energy-drinks/juiced-monster/juiced-monster-rio-punch/',
     dosage:50, unite:'cl',
@@ -248,7 +249,8 @@ const products = [
     categorie:'boissons', souscategorie:'Boissons énergisantes',
     nom:'Monster Ultra White',
     marque:'Monster Energy',
-    image:'https://images.openfoodfacts.org/images/products/506/033/750/0982/front_en.36.400.jpg',
+    image:'monster-ultra-white.png',
+    svgFallback:'white',
     description:'Zéro sucre, zéro calorie. Saveur citrus rafraîchissante. 150 mg de caféine. Canette 50cl.',
     lien:'https://www.monsterenergy.com/fr-fr/energy-drinks/zero-sucre/ultra-white/',
     dosage:50, unite:'cl',
@@ -268,7 +270,90 @@ const products = [
   { id:11, coming:true, categorie:'hygiene',    souscategorie:'Entretien ménager' },
 ];
 
-/* ─── HELPERS ─── */
+/* ─── SVG FALLBACK CANS ─── */
+const SVG_CANS = {
+  rio: `<svg viewBox="0 0 120 200" xmlns="http://www.w3.org/2000/svg" style="height:160px;width:auto">
+    <defs>
+      <linearGradient id="rg1" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" style="stop-color:#1a6b2a"/>
+        <stop offset="40%" style="stop-color:#2d9e42"/>
+        <stop offset="100%" style="stop-color:#1a6b2a"/>
+      </linearGradient>
+      <linearGradient id="rg2" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" style="stop-color:#e8c547;stop-opacity:.9"/>
+        <stop offset="50%" style="stop-color:#f5d55e"/>
+        <stop offset="100%" style="stop-color:#e8c547;stop-opacity:.9"/>
+      </linearGradient>
+    </defs>
+    <!-- can body -->
+    <rect x="15" y="20" width="90" height="155" rx="12" fill="url(#rg1)"/>
+    <!-- shine -->
+    <rect x="20" y="20" width="18" height="155" rx="6" fill="white" opacity=".08"/>
+    <!-- top band -->
+    <rect x="15" y="20" width="90" height="30" rx="12" fill="#1a5c24"/>
+    <!-- bottom band -->
+    <rect x="15" y="145" width="90" height="30" rx="0" fill="#1a5c24"/>
+    <rect x="15" y="163" width="90" height="12" rx="12" fill="#1a5c24"/>
+    <!-- yellow stripe -->
+    <rect x="15" y="50" width="90" height="10" fill="url(#rg2)"/>
+    <rect x="15" y="140" width="90" height="8" fill="url(#rg2)"/>
+    <!-- M claw -->
+    <text x="60" y="110" text-anchor="middle" font-family="Arial Black,sans-serif" font-size="42" font-weight="900" fill="#e8c547" opacity=".95">M</text>
+    <!-- RIO PUNCH text -->
+    <text x="60" y="130" text-anchor="middle" font-family="Arial,sans-serif" font-size="8" font-weight="700" fill="white" letter-spacing="2">RIO PUNCH</text>
+    <!-- top ring -->
+    <ellipse cx="60" cy="22" rx="35" ry="8" fill="#silver" stroke="#aaa" stroke-width="1" fill="#ccc"/>
+    <ellipse cx="60" cy="168" rx="35" ry="8" fill="#ccc"/>
+  </svg>`,
+
+  white: `<svg viewBox="0 0 120 200" xmlns="http://www.w3.org/2000/svg" style="height:160px;width:auto">
+    <defs>
+      <linearGradient id="wg1" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" style="stop-color:#c8cdd6"/>
+        <stop offset="40%" style="stop-color:#eaecf0"/>
+        <stop offset="100%" style="stop-color:#c8cdd6"/>
+      </linearGradient>
+      <linearGradient id="wg2" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" style="stop-color:#a0a8b5"/>
+        <stop offset="50%" style="stop-color:#c5cad4"/>
+        <stop offset="100%" style="stop-color:#a0a8b5"/>
+      </linearGradient>
+    </defs>
+    <rect x="15" y="20" width="90" height="155" rx="12" fill="url(#wg1)"/>
+    <rect x="20" y="20" width="18" height="155" rx="6" fill="white" opacity=".4"/>
+    <rect x="15" y="20" width="90" height="30" rx="12" fill="url(#wg2)"/>
+    <rect x="15" y="145" width="90" height="30" rx="0" fill="url(#wg2)"/>
+    <rect x="15" y="163" width="90" height="12" rx="12" fill="url(#wg2)"/>
+    <!-- M claw silver -->
+    <text x="60" y="110" text-anchor="middle" font-family="Arial Black,sans-serif" font-size="42" font-weight="900" fill="#4a5060" opacity=".9">M</text>
+    <text x="60" y="130" text-anchor="middle" font-family="Arial,sans-serif" font-size="8" font-weight="700" fill="#4a5060" letter-spacing="2">ULTRA WHITE</text>
+    <text x="60" y="143" text-anchor="middle" font-family="Arial,sans-serif" font-size="6" fill="#6b7080" letter-spacing="1">ZERO SUGAR</text>
+    <ellipse cx="60" cy="22" rx="35" ry="8" fill="#bbbfc8"/>
+    <ellipse cx="60" cy="168" rx="35" ry="8" fill="#bbbfc8"/>
+  </svg>`
+};
+
+/* ─── IMAGE LOADER ─── */
+function loadImage(wrap, src, fallbackSvg) {
+  const tags = Array.from(wrap.querySelectorAll('.card-tag,.card-subtag,.badge-stock'));
+  if (!src) {
+    wrap.innerHTML = fallbackSvg || '<div class="card-placeholder">📦</div>';
+    tags.forEach(t => wrap.appendChild(t));
+    return;
+  }
+  const img = document.createElement('img');
+  img.style.cssText = 'height:100%;width:100%;object-fit:contain;padding:12px;display:block';
+  img.loading = 'lazy';
+  img.alt = src;
+  img.onerror = () => {
+    wrap.innerHTML = fallbackSvg || '<div class="card-placeholder">📦</div>';
+    tags.forEach(t => wrap.appendChild(t));
+  };
+  img.src = src;
+  wrap.innerHTML = '';
+  wrap.appendChild(img);
+  tags.forEach(t => wrap.appendChild(t));
+}
 const calcTTC   = (ht,t)  => ht*(1+t/100);
 const calcTotal = (ht,q)  => ht*q;
 const fmt       = n => n.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
@@ -366,10 +451,10 @@ function render(){
     const ttc=calcTTC(p.prixHT,p.tva);
     const total=calcTotal(p.prixHT,p.qteMin);
     const dose=fmtDose(p);
+    const fallbackSvg = p.svgFallback ? SVG_CANS[p.svgFallback] : null;
 
     el.innerHTML=`
-      <div class="card-img-wrap">
-        ${p.image?`<img src="${p.image}" alt="${p.nom}" loading="lazy" onerror="this.outerHTML='<div class=card-placeholder>📦</div>'">`:`<div class="card-placeholder">📦</div>`}
+      <div class="card-img-wrap" id="imgwrap-${p.id}">
         <span class="card-tag">${p.categorie}</span>
         ${p.souscategorie?`<span class="card-subtag">${p.souscategorie}</span>`:''}
         <span class="badge-stock ${p.stock}">${p.stockLabel}</span>
@@ -393,6 +478,10 @@ function render(){
         <button class="btn-info" onclick="openModal(${p.id})">📋</button>
       </div>`;
     grid.appendChild(el);
+    if (!p.coming) {
+      const wrap = document.getElementById(`imgwrap-${p.id}`);
+      if (wrap) loadImage(wrap, p.image, SVG_CANS[p.svgFallback]);
+    }
   });
 }
 
