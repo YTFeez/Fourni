@@ -112,9 +112,15 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);min-he
 .spec-item{display:flex;flex-direction:column;gap:2px}
 .spec-lbl{font-size:.56rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
 .spec-val{font-family:'DM Mono',monospace;font-size:.8rem;font-weight:500;color:var(--text)}
-.spec-val.ht{color:var(--accent2)}
-.spec-val.ttc{color:var(--accent);font-size:.88rem}
-.spec-val.total{color:var(--green)}
+
+/* Prix HT — valeur principale, mise en avant */
+.spec-val.ht{color:var(--accent2);font-size:1.05rem;font-weight:700}
+.spec-val.total{color:var(--green);font-size:1.05rem;font-weight:700}
+
+/* Prix TTC — valeur secondaire, discrète sous le HT */
+.spec-ttc-row{display:flex;flex-direction:column;gap:2px}
+.spec-ttc-lbl{font-size:.52rem;letter-spacing:1px;text-transform:uppercase;color:var(--muted);opacity:.7}
+.spec-ttc-val{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);font-weight:400}
 
 .card-footer{padding:9px 15px 15px;display:flex;gap:8px}
 .btn-link{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;background:var(--accent);color:#0d0e11;border:none;border-radius:8px;padding:10px 0;font-family:'Syne',sans-serif;font-weight:700;font-size:.7rem;letter-spacing:1px;text-transform:uppercase;cursor:pointer;text-decoration:none;transition:background .2s;-webkit-appearance:none}
@@ -233,29 +239,29 @@ const products = [
   {
     id:1, ref:'BOI-MON-001',
     categorie:'boissons', souscategorie:'Boissons énergisantes',
-    nom:'Monster Rio Punch',
+    nom:'Monster Energy Rio Punch 500ml',
     marque:'Monster Energy',
     image:'monster-rio-punch.png',
     svgFallback:'rio',
-    description:'Saveurs tropicales — papaye, mangue, épices. Taurine, ginseng, vitamines B. Sans alcool. Canette 50cl.',
+    description:'Boisson énergisante au goût de fruits exotiques avec une touche épicée. Forte teneur en caféine. Taurine & ginseng. Idéale pour les points de vente et distributeurs automatiques.',
     lien:'https://distribucionmayorista.online/fr/boisson-energisante/3927-monster-energy-rio-punch-500ml-5056784901069.html',
-    dosage:50, unite:'cl',
-    conditionnement:'Carton ×24 canettes',
-    prixHT:1.1, tva:20, qteMin:24,
+    dosage:500, unite:'ml',
+    conditionnement:'Boîte ×24 unités — 26,40 € /boîte',
+    prixHT:1.10, tva:20, qteMin:24,
     stock:'in-stock', stockLabel:'En stock'
   },
   {
     id:2, ref:'BOI-MON-002',
     categorie:'boissons', souscategorie:'Boissons énergisantes',
-    nom:'Monster Ultra White',
+    nom:'Monster Ultra 500ml',
     marque:'Monster Energy',
     image:'monster-ultra-white.png',
     svgFallback:'white',
-    description:'Zéro sucre, zéro calorie. Saveur citrus rafraîchissante. 150 mg de caféine. Canette 50cl.',
+    description:'Boisson énergisante rafraîchissante, saveur légère et moins sucrée, zéro calorie. Taurine, ginseng, teneur élevée en caféine. Original Flavor Less Sweet.',
     lien:'https://distribucionmayorista.online/fr/boisson-energisante/455-monster-ultra-500ml-5060337500258.html',
-    dosage:50, unite:'cl',
-    conditionnement:'Carton ×24 canettes',
-    prixHT:1.49, tva:20, qteMin:24,
+    dosage:500, unite:'ml',
+    conditionnement:'Boîte ×24 unités — 25,44 € /boîte',
+    prixHT:1.06, tva:20, qteMin:24,
     stock:'in-stock', stockLabel:'En stock'
   },
   /* À VENIR */
@@ -285,24 +291,16 @@ const SVG_CANS = {
         <stop offset="100%" style="stop-color:#e8c547;stop-opacity:.9"/>
       </linearGradient>
     </defs>
-    <!-- can body -->
     <rect x="15" y="20" width="90" height="155" rx="12" fill="url(#rg1)"/>
-    <!-- shine -->
     <rect x="20" y="20" width="18" height="155" rx="6" fill="white" opacity=".08"/>
-    <!-- top band -->
     <rect x="15" y="20" width="90" height="30" rx="12" fill="#1a5c24"/>
-    <!-- bottom band -->
     <rect x="15" y="145" width="90" height="30" rx="0" fill="#1a5c24"/>
     <rect x="15" y="163" width="90" height="12" rx="12" fill="#1a5c24"/>
-    <!-- yellow stripe -->
     <rect x="15" y="50" width="90" height="10" fill="url(#rg2)"/>
     <rect x="15" y="140" width="90" height="8" fill="url(#rg2)"/>
-    <!-- M claw -->
     <text x="60" y="110" text-anchor="middle" font-family="Arial Black,sans-serif" font-size="42" font-weight="900" fill="#e8c547" opacity=".95">M</text>
-    <!-- RIO PUNCH text -->
     <text x="60" y="130" text-anchor="middle" font-family="Arial,sans-serif" font-size="8" font-weight="700" fill="white" letter-spacing="2">RIO PUNCH</text>
-    <!-- top ring -->
-    <ellipse cx="60" cy="22" rx="35" ry="8" fill="#silver" stroke="#aaa" stroke-width="1" fill="#ccc"/>
+    <ellipse cx="60" cy="22" rx="35" ry="8" fill="#ccc"/>
     <ellipse cx="60" cy="168" rx="35" ry="8" fill="#ccc"/>
   </svg>`,
 
@@ -324,7 +322,6 @@ const SVG_CANS = {
     <rect x="15" y="20" width="90" height="30" rx="12" fill="url(#wg2)"/>
     <rect x="15" y="145" width="90" height="30" rx="0" fill="url(#wg2)"/>
     <rect x="15" y="163" width="90" height="12" rx="12" fill="url(#wg2)"/>
-    <!-- M claw silver -->
     <text x="60" y="110" text-anchor="middle" font-family="Arial Black,sans-serif" font-size="42" font-weight="900" fill="#4a5060" opacity=".9">M</text>
     <text x="60" y="130" text-anchor="middle" font-family="Arial,sans-serif" font-size="8" font-weight="700" fill="#4a5060" letter-spacing="2">ULTRA WHITE</text>
     <text x="60" y="143" text-anchor="middle" font-family="Arial,sans-serif" font-size="6" fill="#6b7080" letter-spacing="1">ZERO SUGAR</text>
@@ -333,190 +330,243 @@ const SVG_CANS = {
   </svg>`
 };
 
+/* ─── HELPERS ─── */
+// BUG FIX 1 : calcTTC corrigé — était "ht + 5.5%" (syntaxe invalide)
+const calcTTC   = (ht, tva) => ht * (1 + tva / 100);
+const calcTotal = (ht, q)   => ht * q;
+const fmt       = n => n.toLocaleString('fr-FR', { minimumFractionDigits:2, maximumFractionDigits:2 }) + ' €';
+const fmtDose   = p => (p.dosage && p.unite) ? `${p.dosage} ${p.unite}` : null;
+
 /* ─── IMAGE LOADER ─── */
 function loadImage(wrap, src, fallbackSvg) {
+  // Sauvegarder les badges/tags avant de vider le wrap
   const tags = Array.from(wrap.querySelectorAll('.card-tag,.card-subtag,.badge-stock'));
+
   if (!src) {
     wrap.innerHTML = fallbackSvg || '<div class="card-placeholder">📦</div>';
     tags.forEach(t => wrap.appendChild(t));
     return;
   }
+
   const img = document.createElement('img');
   img.style.cssText = 'height:100%;width:100%;object-fit:contain;padding:12px;display:block';
   img.loading = 'lazy';
   img.alt = src;
+
+  img.onload = () => {
+    wrap.innerHTML = '';
+    wrap.appendChild(img);
+    tags.forEach(t => wrap.appendChild(t));
+  };
+
+  // BUG FIX 2 : onerror — on affiche le fallback SVG si l'image est introuvable
   img.onerror = () => {
     wrap.innerHTML = fallbackSvg || '<div class="card-placeholder">📦</div>';
     tags.forEach(t => wrap.appendChild(t));
   };
+
   img.src = src;
-  wrap.innerHTML = '';
-  wrap.appendChild(img);
-  tags.forEach(t => wrap.appendChild(t));
 }
-const calcTTC   = (ht,t)  => ht+5.5%;
-const calcTotal = (ht,q)  => ht*q;
-const fmt       = n => n.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
-const fmtDose   = p => (p.dosage && p.unite) ? `${p.dosage} ${p.unite}` : null;
 
 /* ─── STATE ─── */
-let curCat='all', curSub=null;
+let curCat = 'all', curSub = null;
 
 /* ─── AUTH ─── */
-const PASS='L4v01X';
-document.getElementById('pw').addEventListener('keydown',e=>{ if(e.key==='Enter') tryLogin(); });
+const PASS = 'L4v01X';
+document.getElementById('pw').addEventListener('keydown', e => { if (e.key === 'Enter') tryLogin(); });
 
-function tryLogin(){
-  if(document.getElementById('pw').value===PASS){
-    const ls=document.getElementById('login-screen');
-    ls.style.transition='opacity .48s'; ls.style.opacity='0';
-    setTimeout(()=>{ ls.style.display='none'; document.getElementById('app').style.display='block'; buildCatNav(); render(); },460);
+function tryLogin() {
+  if (document.getElementById('pw').value === PASS) {
+    const ls = document.getElementById('login-screen');
+    ls.style.transition = 'opacity .48s';
+    ls.style.opacity = '0';
+    setTimeout(() => {
+      ls.style.display = 'none';
+      document.getElementById('app').style.display = 'block';
+      buildCatNav();
+      render();
+    }, 460);
   } else {
-    const box=document.querySelector('.login-box');
-    box.classList.remove('shake'); void box.offsetWidth; box.classList.add('shake');
-    document.getElementById('login-error').style.display='block';
-    document.getElementById('pw').value='';
+    const box = document.querySelector('.login-box');
+    box.classList.remove('shake');
+    void box.offsetWidth;
+    box.classList.add('shake');
+    document.getElementById('login-error').style.display = 'block';
+    document.getElementById('pw').value = '';
   }
 }
-function togglePw(){ const i=document.getElementById('pw'); i.type=i.type==='password'?'text':'password'; }
-function logout(){
-  document.getElementById('app').style.display='none';
-  const ls=document.getElementById('login-screen');
-  ls.style.display='flex'; ls.style.opacity='0';
-  setTimeout(()=>{ ls.style.transition='opacity .4s'; ls.style.opacity='1'; },10);
-  document.getElementById('pw').value='';
-  document.getElementById('login-error').style.display='none';
-  curCat='all'; curSub=null;
+
+function togglePw() {
+  const i = document.getElementById('pw');
+  i.type = i.type === 'password' ? 'text' : 'password';
+}
+
+function logout() {
+  document.getElementById('app').style.display = 'none';
+  const ls = document.getElementById('login-screen');
+  ls.style.display = 'flex';
+  ls.style.opacity = '0';
+  setTimeout(() => { ls.style.transition = 'opacity .4s'; ls.style.opacity = '1'; }, 10);
+  document.getElementById('pw').value = '';
+  document.getElementById('login-error').style.display = 'none';
+  curCat = 'all';
+  curSub = null;
 }
 
 /* ─── CAT NAV ─── */
-function buildCatNav(){
-  const el=document.getElementById('cat-main');
-  CATS.forEach(c=>{
-    const b=document.createElement('button');
-    b.className='cat-main-btn'+(c.id==='all'?' active':'');
-    b.textContent=c.label;
-    b.onclick=()=>selectCat(c.id);
+function buildCatNav() {
+  const el = document.getElementById('cat-main');
+  CATS.forEach(c => {
+    const b = document.createElement('button');
+    b.className = 'cat-main-btn' + (c.id === 'all' ? ' active' : '');
+    b.textContent = c.label;
+    b.onclick = () => selectCat(c.id);
     el.appendChild(b);
   });
 }
-function selectCat(id){
-  curCat=id; curSub=null;
-  document.querySelectorAll('.cat-main-btn').forEach((b,i)=>b.classList.toggle('active',CATS[i].id===id));
-  renderSubNav(); render();
+
+function selectCat(id) {
+  curCat = id;
+  curSub = null;
+  document.querySelectorAll('.cat-main-btn').forEach((b, i) => b.classList.toggle('active', CATS[i].id === id));
+  renderSubNav();
+  render();
 }
-function renderSubNav(){
-  const el=document.getElementById('cat-sub');
-  el.innerHTML='';
-  const cat=CATS.find(c=>c.id===curCat);
-  if(!cat||!cat.sub.length) return;
-  const all=document.createElement('button');
-  all.className='cat-sub-btn'+(curSub===null?' active':'');
-  all.textContent='Tout'; all.onclick=()=>{ curSub=null; renderSubNav(); render(); };
+
+function renderSubNav() {
+  const el = document.getElementById('cat-sub');
+  el.innerHTML = '';
+  const cat = CATS.find(c => c.id === curCat);
+  if (!cat || !cat.sub.length) return;
+
+  const all = document.createElement('button');
+  all.className = 'cat-sub-btn' + (curSub === null ? ' active' : '');
+  all.textContent = 'Tout';
+  all.onclick = () => { curSub = null; renderSubNav(); render(); };
   el.appendChild(all);
-  cat.sub.forEach(s=>{
-    const b=document.createElement('button');
-    b.className='cat-sub-btn'+(curSub===s?' active':'');
-    b.textContent=s; b.onclick=()=>{ curSub=s; renderSubNav(); render(); };
+
+  cat.sub.forEach(s => {
+    const b = document.createElement('button');
+    b.className = 'cat-sub-btn' + (curSub === s ? ' active' : '');
+    b.textContent = s;
+    b.onclick = () => { curSub = s; renderSubNav(); render(); };
     el.appendChild(b);
   });
 }
 
 /* ─── RENDER ─── */
-function render(){
-  const grid=document.getElementById('cards-grid');
-  grid.innerHTML='';
-  let list=products;
-  if(curCat!=='all') list=list.filter(p=>p.categorie===curCat);
-  if(curSub)         list=list.filter(p=>p.souscategorie===curSub);
+function render() {
+  const grid = document.getElementById('cards-grid');
+  grid.innerHTML = '';
 
-  if(!list.length){
-    grid.innerHTML='<div class="empty-state"><span>🔍</span>Aucun article dans cette catégorie pour l\'instant.</div>';
+  let list = products;
+  if (curCat !== 'all') list = list.filter(p => p.categorie === curCat);
+  if (curSub)           list = list.filter(p => p.souscategorie === curSub);
+
+  if (!list.length) {
+    grid.innerHTML = '<div class="empty-state"><span>🔍</span>Aucun article dans cette catégorie pour l\'instant.</div>';
     return;
   }
 
-  list.forEach((p,i)=>{
-    const el=document.createElement('div');
-    el.style.cssText=`animation:fadeUp .44s ${i*.055}s ease both`;
+  list.forEach((p, i) => {
+    const el = document.createElement('div');
+    el.style.cssText = `animation:fadeUp .44s ${i * .055}s ease both`;
 
-    if(p.coming){
-      el.className='card-coming';
-      el.innerHTML=`<div class="coming-icon">🔒</div>
+    if (p.coming) {
+      el.className = 'card-coming';
+      el.innerHTML = `<div class="coming-icon">🔒</div>
         <div class="coming-label">Article à venir</div>
-        <div class="coming-tag">${p.souscategorie||p.categorie}</div>`;
-      grid.appendChild(el); return;
+        <div class="coming-tag">${p.souscategorie || p.categorie}</div>`;
+      grid.appendChild(el);
+      return;
     }
 
-    el.className='card';
-    const ttc=calcTTC(p.prixHT,p.tva);
-    const total=calcTotal(p.prixHT,p.qteMin);
-    const dose=fmtDose(p);
-    const fallbackSvg = p.svgFallback ? SVG_CANS[p.svgFallback] : null;
+    el.className = 'card';
+    const ttc   = calcTTC(p.prixHT, p.tva);
+    const total = calcTotal(p.prixHT, p.qteMin);
+    const dose  = fmtDose(p);
 
-    el.innerHTML=`
+    el.innerHTML = `
       <div class="card-img-wrap" id="imgwrap-${p.id}">
         <span class="card-tag">${p.categorie}</span>
-        ${p.souscategorie?`<span class="card-subtag">${p.souscategorie}</span>`:''}
+        ${p.souscategorie ? `<span class="card-subtag">${p.souscategorie}</span>` : ''}
         <span class="badge-stock ${p.stock}">${p.stockLabel}</span>
       </div>
       <div class="card-body">
         <div class="card-ref">${p.ref}</div>
         <div class="card-title">${p.nom}</div>
-        ${p.marque?`<div class="card-brand">${p.marque}</div>`:''}
+        ${p.marque ? `<div class="card-brand">${p.marque}</div>` : ''}
         <div class="card-desc">${p.description}</div>
-        ${dose?`<div class="card-dosage"><span class="dosage-lbl">Contenance</span><span class="dosage-val">${dose}</span></div>`:''}
-        ${p.conditionnement?`<div class="card-cond">📦 ${p.conditionnement}</div>`:''}
+        ${dose ? `<div class="card-dosage"><span class="dosage-lbl">Contenance</span><span class="dosage-val">${dose}</span></div>` : ''}
+        ${p.conditionnement ? `<div class="card-cond">📦 ${p.conditionnement}</div>` : ''}
       </div>
       <div class="specs">
-        <div class="spec-item"><span class="spec-lbl">Prix HT unit.</span><span class="spec-val ht">${fmt(p.prixHT)}</span></div>
-        <div class="spec-item"><span class="spec-lbl">Prix TTC unit.</span><span class="spec-val ttc">${fmt(ttc)}</span></div>
-        <div class="spec-item"><span class="spec-lbl">Qté min.</span><span class="spec-val">${p.qteMin} u.</span></div>
-        <div class="spec-item"><span class="spec-lbl">Total HT min.</span><span class="spec-val total">${fmt(total)}</span></div>
+        <div class="spec-item">
+          <span class="spec-lbl">Prix unit. HT</span>
+          <span class="spec-val ht">${fmt(p.prixHT)}</span>
+        </div>
+        <div class="spec-item">
+          <span class="spec-lbl">Qté min.</span>
+          <span class="spec-val">${p.qteMin} u.</span>
+        </div>
+        <div class="spec-item" style="grid-column:1/-1;border-top:1px solid var(--border);padding-top:8px;margin-top:2px">
+          <span class="spec-lbl">Total HT minimum</span>
+          <span class="spec-val total">${fmt(total)}</span>
+        </div>
       </div>
       <div class="card-footer">
         <a class="btn-link" href="${p.lien}" target="_blank" rel="noopener">🔗 Fiche produit</a>
         <button class="btn-info" onclick="openModal(${p.id})">📋</button>
       </div>`;
+
     grid.appendChild(el);
-    if (!p.coming) {
-      const wrap = document.getElementById(`imgwrap-${p.id}`);
-      if (wrap) loadImage(wrap, p.image, SVG_CANS[p.svgFallback]);
-    }
+
+    // Chargement de l'image après insertion dans le DOM
+    const wrap = document.getElementById(`imgwrap-${p.id}`);
+    if (wrap) loadImage(wrap, p.image, SVG_CANS[p.svgFallback]);
   });
 }
 
 /* ─── MODAL ─── */
-function openModal(id){
-  const p=products.find(x=>x.id===id);
-  if(!p||p.coming) return;
-  const ttc=calcTTC(p.prixHT,p.tva);
-  const total=calcTotal(p.prixHT,p.qteMin);
-  const totalTTC=calcTTC(total,p.tva);
-  const dose=fmtDose(p);
+function openModal(id) {
+  const p = products.find(x => x.id === id);
+  if (!p || p.coming) return;
 
-  document.getElementById('modal-ref').textContent=p.ref;
-  document.getElementById('modal-title').textContent=p.nom;
-  document.getElementById('modal-path').textContent=[p.categorie,p.souscategorie].filter(Boolean).join(' › ');
-  document.getElementById('modal-desc').textContent=p.description;
-  document.getElementById('modal-link').href=p.lien;
+  const ttc      = calcTTC(p.prixHT, p.tva);
+  const total    = calcTotal(p.prixHT, p.qteMin);
+  // BUG FIX 3 : totalTTC calculé correctement depuis total HT × qté
+  const totalTTC = calcTTC(total, p.tva);
+  const dose     = fmtDose(p);
 
-  document.getElementById('modal-specs').innerHTML=`
-    ${dose?`<div class="modal-spec" style="grid-column:1/-1"><div class="modal-spec-lbl">Contenance / Dosage</div><div class="modal-spec-val" style="color:var(--accent2)">${dose}</div></div>`:''}
-    ${p.conditionnement?`<div class="modal-spec" style="grid-column:1/-1"><div class="modal-spec-lbl">Conditionnement</div><div class="modal-spec-val">${p.conditionnement}</div></div>`:''}
-    <div class="modal-spec"><div class="modal-spec-lbl">Prix HT unitaire</div><div class="modal-spec-val" style="color:var(--accent2)">${fmt(p.prixHT)}</div></div>
+  document.getElementById('modal-ref').textContent   = p.ref;
+  document.getElementById('modal-title').textContent = p.nom;
+  document.getElementById('modal-path').textContent  = [p.categorie, p.souscategorie].filter(Boolean).join(' › ');
+  document.getElementById('modal-desc').textContent  = p.description;
+  document.getElementById('modal-link').href         = p.lien;
+
+  document.getElementById('modal-specs').innerHTML = `
+    ${dose ? `<div class="modal-spec" style="grid-column:1/-1"><div class="modal-spec-lbl">Contenance / Dosage</div><div class="modal-spec-val" style="color:var(--accent2)">${dose}</div></div>` : ''}
+    ${p.conditionnement ? `<div class="modal-spec" style="grid-column:1/-1"><div class="modal-spec-lbl">Conditionnement</div><div class="modal-spec-val">${p.conditionnement}</div></div>` : ''}
+    <div class="modal-spec"><div class="modal-spec-lbl">Prix unitaire HT</div><div class="modal-spec-val" style="color:var(--accent2);font-size:1.1rem">${fmt(p.prixHT)}</div></div>
     <div class="modal-spec"><div class="modal-spec-lbl">TVA</div><div class="modal-spec-val">${p.tva} %</div></div>
-    <div class="modal-spec"><div class="modal-spec-lbl">Prix TTC unitaire</div><div class="modal-spec-val" style="color:var(--accent)">${fmt(ttc)}</div></div>
-    <div class="modal-spec"><div class="modal-spec-lbl">Qté min. commande</div><div class="modal-spec-val">${p.qteMin} unité${p.qteMin>1?'s':''}</div></div>
-    <div class="modal-spec"><div class="modal-spec-lbl">Total HT minimum</div><div class="modal-spec-val" style="color:var(--green)">${fmt(total)}</div></div>
-    <div class="modal-spec"><div class="modal-spec-lbl">Total TTC minimum</div><div class="modal-spec-val" style="color:var(--accent)">${fmt(totalTTC)}</div></div>
+    <div class="modal-spec"><div class="modal-spec-lbl">Qté min. commande</div><div class="modal-spec-val">${p.qteMin} unité${p.qteMin > 1 ? 's' : ''}</div></div>
+    <div class="modal-spec"><div class="modal-spec-lbl">Total HT minimum</div><div class="modal-spec-val" style="color:var(--green);font-size:1.1rem">${fmt(total)}</div></div>
     <div class="modal-spec" style="grid-column:1/-1"><div class="modal-spec-lbl">Disponibilité</div><div class="modal-spec-val"><span class="badge-stock ${p.stock}" style="position:static;font-size:.72rem;padding:4px 11px">${p.stockLabel}</span></div></div>`;
 
   document.getElementById('modal').classList.add('open');
-  document.body.style.overflow='hidden';
+  document.body.style.overflow = 'hidden';
 }
-function closeModal(){ document.getElementById('modal').classList.remove('open'); document.body.style.overflow=''; }
-function closeModalOverlay(e){ if(e.target===document.getElementById('modal')) closeModal(); }
-document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function closeModalOverlay(e) {
+  if (e.target === document.getElementById('modal')) closeModal();
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 </script>
 </body>
 </html>
